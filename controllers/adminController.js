@@ -72,4 +72,25 @@ const postAdmin = async (req, res) => {
   }
 };
 
-module.exports = { getAdmin, postAdmin };
+const deleteAdmin = async (req, res) => {
+  const { admin_id, deleted_by } = req.params;
+  try {
+    const deleteRes = await service.deleteAdmin(admin_id, deleted_by);
+    if (!deleteRes) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Failed to delete admin." });
+    }
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "Successfully deleted admin." });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+    });
+  }
+};
+
+module.exports = { getAdmin, postAdmin, deleteAdmin };

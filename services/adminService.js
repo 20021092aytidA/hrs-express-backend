@@ -1,4 +1,5 @@
 const db = require("../database");
+const date = require("../helper/date");
 
 const getAdmin = async (httpQuery) => {
   let query = "SELECT * FROM admin";
@@ -29,11 +30,6 @@ const postAdmin = async (
   isSuperAdmin,
   addedBy,
 ) => {
-  const date = new Date();
-  const todayDate = date.toISOString().slice(0, 10);
-  const time = date.toTimeString().split(" ")[0];
-  const dateTime = `${todayDate} ${time}`;
-
   const [post] = await db.query(
     "INSERT INTO admin (full_name, username, password, is_super_admin, added_at, added_by) VALUES (?,?,?,?,?,?)",
     [
@@ -41,7 +37,7 @@ const postAdmin = async (
       username,
       password,
       isSuperAdmin === "true" ? "TRUE" : "FALSE",
-      dateTime,
+      date.getDateTime(),
       addedBy,
     ],
   );
@@ -49,4 +45,13 @@ const postAdmin = async (
   return post.affectedRows < 1 ? false : true;
 };
 
-module.exports = { getAdmin, postAdmin };
+const deleteAdmin = async (adminID, deletedBy) => {
+  const [deleteProcess] = await db.query(
+    "UPDATE admin SET deleted_at = ?, deleted_by = ? WHERE admin_id = ?",
+    [date.getDateTime(), deletedBy, adminID],
+  );
+
+  return deleteProcess.affectedRows < 1 ? false : true;
+};
+
+module.exports = { getAdmin, postAdmin, deleteAdmin };
