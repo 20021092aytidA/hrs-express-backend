@@ -4,4 +4,6 @@ const adminController = require("../controllers/adminController");
 
 router.get("/", adminController.getAdmin);
 
+router.post("/", adminController.postAdmin);
+
 module.exports = router;

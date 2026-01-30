@@ -18,11 +18,35 @@ const getAdmin = async (httpQuery) => {
     });
   }
 
-  //   console.log(query);
-  //   console.log(params);
-
   const [rows] = await db.query(query, params);
   return rows;
 };
 
-module.exports = { getAdmin };
+const postAdmin = async (
+  fullName,
+  username,
+  password,
+  isSuperAdmin,
+  addedBy,
+) => {
+  const date = new Date();
+  const todayDate = date.toISOString().slice(0, 10);
+  const time = date.toTimeString().split(" ")[0];
+  const dateTime = `${todayDate} ${time}`;
+
+  const [post] = await db.query(
+    "INSERT INTO admin (full_name, username, password, is_super_admin, added_at, added_by) VALUES (?,?,?,?,?,?)",
+    [
+      fullName,
+      username,
+      password,
+      isSuperAdmin === "true" ? "TRUE" : "FALSE",
+      dateTime,
+      addedBy,
+    ],
+  );
+
+  return post.affectedRows < 1 ? false : true;
+};
+
+module.exports = { getAdmin, postAdmin };
