@@ -33,7 +33,7 @@ const postAdmin = async (req, res) => {
     if (admins.length > 0) {
       return res.status(400).json({
         status: 400,
-        message: "User with the username already exist.",
+        message: "Admin with the username already exist.",
       });
     }
 
@@ -75,6 +75,14 @@ const postAdmin = async (req, res) => {
 const deleteAdmin = async (req, res) => {
   const { admin_id, deleted_by } = req.params;
   try {
+    //CHECK IF EXIST
+    const admin = await service.getAdmin({
+      admin_id: admin_id,
+    });
+    if (admin.length < 1) {
+      return res.status(404).json({ status: 404, message: "No admin found!" });
+    }
+
     const deleteRes = await service.deleteAdmin(admin_id, deleted_by);
     if (!deleteRes) {
       return res
@@ -93,4 +101,53 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
-module.exports = { getAdmin, postAdmin, deleteAdmin };
+const patchAdmin = async (req, res) => {
+  const { admin_id, edited_by } = req.params;
+
+  try {
+    if (!req.body) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Bad request, missing body value(s)." });
+    }
+
+    //CHECK IF EXIST
+    const ifExist = await service.getAdmin({
+      admin_id: admin_id,
+    });
+    if (ifExist.length < 1) {
+      return res.status(404).json({ status: 404, message: "No admin found!" });
+    }
+
+    //CHECK FOR DUPLICATES
+    if (Object.keys(req.body).includes("username")) {
+      const ifDuplicate = await service.getAdmin({
+        username: req.body.username,
+      });
+      if (ifDuplicate.length > 0) {
+        return res.status(400).json({
+          status: 400,
+          message: "Admin with the username already exist.",
+        });
+      }
+    }
+
+    const patchRes = await service.patchAdmin(admin_id, edited_by, req.body);
+    if (!patchRes) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Failed to update admin." });
+    }
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "Successfully update admin." });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+    });
+  }
+};
+
+module.exports = { getAdmin, postAdmin, deleteAdmin, patchAdmin };

@@ -14,10 +14,12 @@ const getAdmin = async (httpQuery) => {
       if (idx === httpQueryLength - 1) {
         query += "";
       } else {
-        query += ", ";
+        query += " AND ";
       }
     });
   }
+
+  console.log(query);
 
   const [rows] = await db.query(query, params);
   return rows;
@@ -54,4 +56,30 @@ const deleteAdmin = async (adminID, deletedBy) => {
   return deleteProcess.affectedRows < 1 ? false : true;
 };
 
-module.exports = { getAdmin, postAdmin, deleteAdmin };
+const patchAdmin = async (adminID, editedBy, httpBody) => {
+  let query = "UPDATE admin SET ";
+  let params = [];
+
+  Object.entries(httpBody).forEach(([key, value], idx) => {
+    params.push(value);
+    query += `${key} = ?, `;
+  });
+
+  query += "edited_by = ?, ";
+  params.push(editedBy);
+
+  query += "edited_at = ? ";
+  params.push(date.getDateTime());
+
+  params.push(adminID);
+  query += "WHERE admin_id = ?";
+
+  console.log(query);
+  console.log(params);
+
+  const [patch] = await db.query(query, params);
+
+  return patch.affectedRows < 1 ? false : true;
+};
+
+module.exports = { getAdmin, postAdmin, deleteAdmin, patchAdmin };
