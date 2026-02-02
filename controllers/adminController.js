@@ -1,5 +1,6 @@
 const service = require("../services/adminService");
 const bcrypt = require("bcrypt");
+const jwtHelper = require("../helper/jwt");
 
 const getAdmin = async (req, res) => {
   try {
@@ -150,4 +151,39 @@ const patchAdmin = async (req, res) => {
   }
 };
 
-module.exports = { getAdmin, postAdmin, deleteAdmin, patchAdmin };
+const loginAdmin = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Bad request, missing body value(s)." });
+    }
+
+    const user = await service.getAdmin({ username: username });
+    if (user.length < 1) {
+      return res.status(404).json({ status: 404, message: "No admin found!" });
+    }
+
+    const isPassCorrect = bcrypt.compareSync(password, password);
+    if (!isPassCorrect) {
+      return res.status(400).json({ status: 400, message: "Wrong password!" });
+    }
+
+    const userToken = jwtHelper.createKey(user[0]);
+
+    return res.status(200).json({
+      status: 200,
+      message: "Login successful.",
+      token: userToken,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+    });
+  }
+};
+
+module.exports = { getAdmin, postAdmin, deleteAdmin, patchAdmin, loginAdmin };
