@@ -24,6 +24,16 @@ const getRole = async (httpQuery) => {
   return roles;
 };
 
+const postRole = async (roleName) => {
+  const [postRes] = await db.query(
+    "INSERT INTO role (role_name) VALUES(?)",
+    roleName,
+  );
+
+  return postRes.affectedRows > 0 ? true : false;
+};
+
 module.exports = {
   getRole,
+  postRole,
 };
