@@ -1,8 +1,8 @@
 const db = require("../database");
 const date = require("../helper/date");
 
-const getAdmin = async (httpQuery) => {
-  let query = "SELECT * FROM admin";
+const getUser = async (httpQuery) => {
+  let query = "SELECT * FROM user";
   let params = [];
   const httpQueryLength = Object.keys(httpQuery).length;
 
@@ -25,20 +25,14 @@ const getAdmin = async (httpQuery) => {
   return rows;
 };
 
-const postAdmin = async (
-  fullName,
-  username,
-  password,
-  isSuperAdmin,
-  addedBy,
-) => {
+const postUser = async (fullName, username, password, isSuperUser, addedBy) => {
   const [post] = await db.query(
-    "INSERT INTO admin (full_name, username, password, is_super_admin, added_at, added_by) VALUES (?,?,?,?,?,?)",
+    "INSERT INTO user (full_name, username, password, is_super_user, added_at, added_by) VALUES (?,?,?,?,?,?)",
     [
       fullName,
       username,
       password,
-      isSuperAdmin === "true" ? "TRUE" : "FALSE",
+      isSuperUser === "true" ? "TRUE" : "FALSE",
       date.getDateTime(),
       addedBy,
     ],
@@ -47,17 +41,17 @@ const postAdmin = async (
   return post.affectedRows < 1 ? false : true;
 };
 
-const deleteAdmin = async (adminID, deletedBy) => {
+const deleteUser = async (userID, deletedBy) => {
   const [deleteProcess] = await db.query(
-    "UPDATE admin SET deleted_at = ?, deleted_by = ? WHERE admin_id = ?",
-    [date.getDateTime(), deletedBy, adminID],
+    "UPDATE user SET deleted_at = ?, deleted_by = ? WHERE user_id = ?",
+    [date.getDateTime(), deletedBy, userID],
   );
 
   return deleteProcess.affectedRows < 1 ? false : true;
 };
 
-const patchAdmin = async (adminID, editedBy, httpBody) => {
-  let query = "UPDATE admin SET ";
+const patchUser = async (userID, editedBy, httpBody) => {
+  let query = "UPDATE user SET ";
   let params = [];
 
   Object.entries(httpBody).forEach(([key, value], idx) => {
@@ -71,8 +65,8 @@ const patchAdmin = async (adminID, editedBy, httpBody) => {
   query += "edited_at = ? ";
   params.push(date.getDateTime());
 
-  params.push(adminID);
-  query += "WHERE admin_id = ?";
+  params.push(userID);
+  query += "WHERE user_id = ?";
 
   console.log(query);
   console.log(params);
@@ -82,4 +76,4 @@ const patchAdmin = async (adminID, editedBy, httpBody) => {
   return patch.affectedRows < 1 ? false : true;
 };
 
-module.exports = { getAdmin, postAdmin, deleteAdmin, patchAdmin };
+module.exports = { getUser, postUser, deleteUser, patchUser };
