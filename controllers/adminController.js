@@ -81,7 +81,7 @@ const deleteAdmin = async (req, res) => {
       admin_id: admin_id,
     });
     if (admin.length < 1) {
-      return res.status(404).json({ status: 404, message: "No admin found!" });
+      return res.status(204).json({ status: 204, message: "No admin found!" });
     }
 
     const deleteRes = await service.deleteAdmin(admin_id, deleted_by);
