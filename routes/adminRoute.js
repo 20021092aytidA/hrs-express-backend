@@ -5,6 +5,7 @@ const adminController = require("../controllers/adminController");
 router.get("/", adminController.getAdmin);
 
 router.post("/", adminController.postAdmin);
+router.post("/", adminController.loginAdmin);
 
 router.delete("/:admin_id/:deleted_by", adminController.deleteAdmin);
 
