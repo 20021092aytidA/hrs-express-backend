@@ -31,9 +31,35 @@ const postRole = async (roleName) => {
   return postRes.affectedRows > 0 ? true : false;
 };
 
+const patchRole = async (roleID, httpBody, userID) => {
+  let query = "UPDATE role SET ";
+  let params = [];
+
+  Object.entries(httpBody).forEach(([key, value]) => {
+    params.push(value);
+    query += `${key} = ?, `;
+  });
+
+  query += "edited_by = ?, ";
+  params.push(userID);
+
+  query += "edited_at = ? ";
+  params.push(date.getDateTime());
+
+  params.push(roleID);
+  query += "WHERE role_id = ?";
+
+  console.log(query);
+  console.log(params);
+
+  const [patch] = await db.query(query, params);
+
+  return patch.affectedRows < 1 ? false : true;
+};
+
 const deleteRole = async (roleID, userID) => {
   const [delRes] = await db.query(
-    "UPDATE user SET deleted_at = ?, deleted_by = ? WHERE = ?",
+    "UPDATE role SET deleted_at = ?, deleted_by = ? WHERE = ?",
     [dateHelper.getDateTime(), userID, roleID],
   );
   return delRes.affectedRows > 0 ? true : false;
@@ -42,5 +68,6 @@ const deleteRole = async (roleID, userID) => {
 module.exports = {
   getRole,
   postRole,
+  patchRole,
   deleteRole,
 };

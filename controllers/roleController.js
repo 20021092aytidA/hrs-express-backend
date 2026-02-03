@@ -12,6 +12,7 @@ const getRole = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -47,6 +48,41 @@ const postRole = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
+    });
+  }
+};
+
+const patchRole = async (req, res) => {
+  const { role_id, user_id } = req.param;
+
+  try {
+    if (!role_id || !user_id) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Bad request, missing param value(s)!" });
+    }
+
+    const role = await service.getRole({ role_id: role_id });
+    if (role.length < 1) {
+      return res.status(204).json({ status: 204, message: "Role not found!" });
+    }
+
+    const patchRes = await service.patchRole(role_id, req.body, user_id);
+    if (!patchRes) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Failed to update role!" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "Successfully update role!" });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -79,6 +115,7 @@ const deleteRole = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -86,5 +123,6 @@ const deleteRole = async (req, res) => {
 module.exports = {
   getRole,
   postRole,
+  patchRole,
   deleteRole,
 };

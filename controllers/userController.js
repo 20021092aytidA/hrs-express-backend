@@ -15,6 +15,7 @@ const getUser = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -69,6 +70,7 @@ const postUser = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -98,6 +100,7 @@ const deleteUser = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -147,6 +150,7 @@ const patchUser = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };
@@ -182,6 +186,7 @@ const loginUser = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "Internal server error.",
+      error: error,
     });
   }
 };

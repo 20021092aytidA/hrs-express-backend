@@ -6,6 +6,8 @@ router.get("/", controller.getRole);
 
 router.post("/", controller.postRole);
 
+router.patch("/:role_id/:user_id", controller.postRole);
+
 router.delete("/:role_id/:user_id", controller.postRole);
 
 module.exports = router;
