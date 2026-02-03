@@ -76,4 +76,9 @@ const patchUser = async (userID, editedBy, httpBody) => {
   return patch.affectedRows < 1 ? false : true;
 };
 
-module.exports = { getUser, postUser, deleteUser, patchUser };
+module.exports = {
+  getUser,
+  postUser,
+  deleteUser,
+  patchUser,
+};

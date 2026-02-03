@@ -51,7 +51,40 @@ const postRole = async (req, res) => {
   }
 };
 
+const deleteRole = async (req, res) => {
+  const { role_id, user_id } = req.params;
+  try {
+    if (!role_id || !admin_id) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Bad request, missing param value(s)!" });
+    }
+
+    const role = await service.getRole({ role_id: role_id });
+    if (role.length < 1) {
+      return res.status(204).json({ status: 204, message: "No role found!" });
+    }
+
+    const delRes = await service.deleteRole(role_id, user_id);
+    if (!delRes) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Failed to delete role!" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "Successfully deleted role!" });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+    });
+  }
+};
+
 module.exports = {
   getRole,
   postRole,
+  deleteRole,
 };

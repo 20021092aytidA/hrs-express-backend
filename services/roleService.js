@@ -20,7 +20,6 @@ const getRole = async (httpQuery) => {
   }
 
   const [roles] = await db.query(query, params);
-
   return roles;
 };
 
@@ -29,11 +28,19 @@ const postRole = async (roleName) => {
     "INSERT INTO role (role_name) VALUES(?)",
     roleName,
   );
-
   return postRes.affectedRows > 0 ? true : false;
+};
+
+const deleteRole = async (roleID, userID) => {
+  const [delRes] = await db.query(
+    "UPDATE user SET deleted_at = ?, deleted_by = ? WHERE = ?",
+    [dateHelper.getDateTime(), userID, roleID],
+  );
+  return delRes.affectedRows > 0 ? true : false;
 };
 
 module.exports = {
   getRole,
   postRole,
+  deleteRole,
 };

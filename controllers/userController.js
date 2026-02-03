@@ -186,4 +186,10 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { getUser, postUser, deleteUser, patchUser, loginUser };
+module.exports = {
+  getUser,
+  postUser,
+  deleteUser,
+  patchUser,
+  loginUser,
+};
