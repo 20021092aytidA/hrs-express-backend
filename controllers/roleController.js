@@ -1,7 +1,27 @@
 const service = require("../services/roleService");
 
 const getRole = async (req, res) => {
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     const roles = await service.getRole(req.query);
     return res.status(200).json({
       status: 200,
@@ -19,7 +39,28 @@ const getRole = async (req, res) => {
 
 const postRole = async (req, res) => {
   const { role_name, added_by } = req.body;
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (!role_name) {
       return res
         .status(400)
@@ -55,8 +96,28 @@ const postRole = async (req, res) => {
 
 const patchRole = async (req, res) => {
   const { role_id, user_id } = req.params;
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
 
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (!role_id || !user_id) {
       return res
         .status(400)
@@ -89,7 +150,28 @@ const patchRole = async (req, res) => {
 
 const deleteRole = async (req, res) => {
   const { role_id, user_id } = req.params;
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (!role_id || !user_id) {
       return res
         .status(400)
