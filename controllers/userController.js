@@ -68,7 +68,9 @@ const postUser = async (req, res) => {
     //  CHECK FOR ROLE
     const role = await roleService.getRole({ role_id: role_id });
     if (role.length < 1) {
-      return res.status(400).json({ status: 400, message: "Role not found!" });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Role does not exist!" });
     }
 
     // CHECK FOR CANDIDATE DETAIL
@@ -78,7 +80,7 @@ const postUser = async (req, res) => {
     // if (candidateDetail.length < 1) {
     //   return res
     //     .status(400)
-    //     .json({ status: 400, message: "Candidate detail not found!" });
+    //     .json({ status: 400, message: "Candidate detail does not exist!" });
     // }
 
     //CHECK FOR DUPLICATES
@@ -200,12 +202,39 @@ const patchUser = async (req, res) => {
       return res.status(404).json({ status: 404, message: "No user found!" });
     }
 
+    //CHECK FOR ROLE
+    if (Object.keys(req.body).includes("role_id")) {
+      const ifDuplicateRole = await roleService.getRole({
+        role_id: req.body.role_id,
+      });
+      if (ifDuplicateRole.length > 0) {
+        return res.status(400).json({
+          status: 400,
+          message: "Role does not exist!.",
+        });
+      }
+    }
+
+    //CHECK FOR CADIDATE
+    // if (Object.keys(req.body).includes("candidate_detail_id")) {
+    //   const ifDuplicateCandidateDetail =
+    //     await candidateDetailService.getCandidateDetail({
+    //       candidate_detail_id: req.body.candidate_detail_id,
+    //     });
+    //   if (ifDuplicateCandidateDetail.length > 0) {
+    //     return res.status(400).json({
+    //       status: 400,
+    //       message: "Candidate detail does not exist!.",
+    //     });
+    //   }
+    // }
+
     //CHECK FOR DUPLICATES
     if (Object.keys(req.body).includes("username")) {
-      const ifDuplicate = await userService.getUser({
+      const ifDuplicateUsername = await userService.getUser({
         username: req.body.username,
       });
-      if (ifDuplicate.length > 0) {
+      if (ifDuplicateUsername.length > 0) {
         return res.status(400).json({
           status: 400,
           message: "User with the username already exist.",
