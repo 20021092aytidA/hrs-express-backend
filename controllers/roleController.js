@@ -54,7 +54,7 @@ const postRole = async (req, res) => {
 };
 
 const patchRole = async (req, res) => {
-  const { role_id, user_id } = req.param;
+  const { role_id, user_id } = req.params;
 
   try {
     if (!role_id || !user_id) {
@@ -90,7 +90,7 @@ const patchRole = async (req, res) => {
 const deleteRole = async (req, res) => {
   const { role_id, user_id } = req.params;
   try {
-    if (!role_id || !admin_id) {
+    if (!role_id || !user_id) {
       return res
         .status(400)
         .json({ status: 400, message: "Bad request, missing param value(s)!" });

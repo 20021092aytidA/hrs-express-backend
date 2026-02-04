@@ -1,5 +1,5 @@
 const db = require("../database");
-const date = require("../helper/date");
+const dateHelper = require("../helper/dateHelper");
 
 const getUser = async (httpQuery) => {
   let query = "SELECT * FROM user";
@@ -33,7 +33,7 @@ const postUser = async (fullName, username, password, isSuperUser, addedBy) => {
       username,
       password,
       isSuperUser === "true" ? "TRUE" : "FALSE",
-      date.getDateTime(),
+      dateHelper.getDateTime(),
       addedBy,
     ],
   );
@@ -44,7 +44,7 @@ const postUser = async (fullName, username, password, isSuperUser, addedBy) => {
 const deleteUser = async (userID, deletedBy) => {
   const [deleteProcess] = await db.query(
     "UPDATE user SET deleted_at = ?, deleted_by = ? WHERE user_id = ?",
-    [date.getDateTime(), deletedBy, userID],
+    [dateHelper.getDateTime(), deletedBy, userID],
   );
 
   return deleteProcess.affectedRows < 1 ? false : true;
@@ -63,13 +63,10 @@ const patchUser = async (userID, editedBy, httpBody) => {
   params.push(editedBy);
 
   query += "edited_at = ? ";
-  params.push(date.getDateTime());
+  params.push(dateHelper.getDateTime());
 
   params.push(userID);
   query += "WHERE user_id = ?";
-
-  console.log(query);
-  console.log(params);
 
   const [patch] = await db.query(query, params);
 
