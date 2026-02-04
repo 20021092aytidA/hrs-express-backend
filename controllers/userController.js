@@ -5,7 +5,27 @@ const bcrypt = require("bcrypt");
 const jwtHelper = require("../helper/jwt");
 
 const getUser = async (req, res) => {
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     const data = await userService.getUser(req.query);
 
     return res.status(200).json({
@@ -42,7 +62,28 @@ const postUser = async (req, res) => {
     added_by,
   } = req.body;
 
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (
       !role_id ||
       !full_name ||
@@ -74,13 +115,15 @@ const postUser = async (req, res) => {
     }
 
     // CHECK FOR CANDIDATE DETAIL
-    const candidateDetail = await candidateDetailService.getCandidateDetail({
-      candidate_detail_id: candidate_detail_id,
-    });
-    if (candidateDetail.length < 1) {
-      return res
-        .status(400)
-        .json({ status: 400, message: "Candidate detail does not exist!" });
+    if (candidate_detail_id) {
+      const candidateDetail = await candidateDetailService.getCandidateDetail({
+        candidate_detail_id: candidate_detail_id,
+      });
+      if (candidateDetail.length < 1) {
+        return res
+          .status(400)
+          .json({ status: 400, message: "Candidate detail does not exist!" });
+      }
     }
 
     //CHECK FOR DUPLICATES
@@ -156,7 +199,28 @@ const postUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const { user_id, deleted_by } = req.params;
+
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     //CHECK IF EXIST
     const user = await userService.getUser({
       user_id: user_id,
@@ -187,7 +251,28 @@ const deleteUser = async (req, res) => {
 const patchUser = async (req, res) => {
   const { user_id, edited_by } = req.params;
 
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (!req.body) {
       return res
         .status(400)
@@ -263,7 +348,6 @@ const patchUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
-
   try {
     if (!username || !password) {
       return res
@@ -276,9 +360,9 @@ const loginUser = async (req, res) => {
       return res.status(404).json({ status: 404, message: "No user found!" });
     }
 
-    const isPassCorrect = bcrypt.compareSync(password, password);
+    const isPassCorrect = bcrypt.compareSync(password, user[0].password);
     if (!isPassCorrect) {
-      return res.status(400).json({ status: 400, message: "Wrong password!" });
+      return res.status(403).json({ status: 403, message: "Wrong password!" });
     }
 
     const userToken = jwtHelper.createKey(user[0]);

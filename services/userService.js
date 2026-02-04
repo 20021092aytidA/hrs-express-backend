@@ -19,8 +19,6 @@ const getUser = async (httpQuery) => {
     });
   }
 
-  console.log(query);
-
   const [rows] = await db.query(query, params);
   return rows;
 };

@@ -18,7 +18,7 @@ const checkKey = (jsonObj) => {
   }
 
   try {
-    const isOk = jwt.verify(jsonObj, process.env.JWT_TOKEN);
+    const isOk = jwt.verify(jsonObj, process.env.JWT_KEY);
     return isOk ? true : false;
   } catch (error) {
     console.log(`Failed to verify JWT with error:\n${error}`);
