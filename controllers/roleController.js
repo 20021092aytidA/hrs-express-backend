@@ -18,7 +18,7 @@ const getRole = async (req, res) => {
 };
 
 const postRole = async (req, res) => {
-  const { role_name } = req.body;
+  const { role_name, added_by } = req.body;
   try {
     if (!role_name) {
       return res
@@ -34,7 +34,7 @@ const postRole = async (req, res) => {
       });
     }
 
-    const postRes = await service.postRole(role_name);
+    const postRes = await service.postRole(role_name, added_by);
     if (!postRes) {
       return res
         .status(500)

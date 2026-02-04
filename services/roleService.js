@@ -23,10 +23,10 @@ const getRole = async (httpQuery) => {
   return roles;
 };
 
-const postRole = async (roleName) => {
+const postRole = async (roleName, addedBy) => {
   const [postRes] = await db.query(
-    "INSERT INTO role (role_name) VALUES(?)",
-    roleName,
+    "INSERT INTO role (role_name, created_by, created_at) VALUES(?,?,?)",
+    [roleName, addedBy, dateHelper.getDateTime()],
   );
   return postRes.affectedRows > 0 ? true : false;
 };
