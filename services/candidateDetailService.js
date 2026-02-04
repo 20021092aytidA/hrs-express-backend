@@ -48,7 +48,27 @@ const postCandidateDetail = async (
   return post.affectedRows > 0 ? true : false;
 };
 
-const patchCandidateDetail = async () => {};
+const patchCandidateDetail = async (candidateDetailID, httpBody, userID) => {
+  let query = "UPDATE candidate_detail SET ";
+  let params = [];
+
+  Object.entries(httpBody).forEach(([key, value]) => {
+    params.push(value);
+    query += `${key} = ?, `;
+  });
+  query += "edited_by = ?, ";
+  params.push(userID);
+
+  query += "edited_at = ? ";
+  params.push(dateHelper.getDateTime());
+
+  params.push(candidateDetailID);
+  query += "WHERE role_id = ?";
+
+  const [patch] = await db.query(query, params);
+
+  return patch.affectedRows < 1 ? false : true;
+};
 
 const deleteCandidateDetail = async (candidateDetailID, userID) => {
   const [delRes] = await db.query(
