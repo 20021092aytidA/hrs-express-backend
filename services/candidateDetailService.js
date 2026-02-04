@@ -50,7 +50,13 @@ const postCandidateDetail = async (
 
 const patchCandidateDetail = async () => {};
 
-const deleteCandidateDetail = async () => {};
+const deleteCandidateDetail = async (candidateDetailID, userID) => {
+  const [delRes] = await db.query(
+    "UPDATE candidate_detail SET deleted_at = ?, deleted_by = ? WHERE candidate_detail_id = ?",
+    [dateHelper.getDateTime(), Number(userID), Number(candidateDetailID)],
+  );
+  return delRes.affectedRows > 0 ? true : false;
+};
 
 module.exports = {
   getCandidateDetail,

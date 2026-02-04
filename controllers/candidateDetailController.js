@@ -82,7 +82,45 @@ const postCandidateDetail = async (req, res) => {
 
 const patchCandidateDetail = async (req, res) => {};
 
-const deleteCandidateDetail = async (req, res) => {};
+const deleteCandidateDetail = async (req, res) => {
+  const { candidate_detail_id, user_id } = req.params;
+  try {
+    if (!candidate_detail_id || !user_id) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Bad request, missing param value(s)!" });
+    }
+
+    const candidateDetail = await service.getCandidateDetail({
+      candidate_detail_id: candidate_detail_id,
+    });
+    if (candidateDetail.length < 1) {
+      return res
+        .status(204)
+        .json({ status: 204, message: "No candidate detail found!" });
+    }
+
+    const delRes = await service.deleteCandidateDetail(
+      candidate_detail_id,
+      user_id,
+    );
+    if (!delRes) {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Failed to delete candidate detail!" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "Successfully deleted candidate detail!" });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+      error: error,
+    });
+  }
+};
 
 module.exports = {
   getCandidateDetail,
