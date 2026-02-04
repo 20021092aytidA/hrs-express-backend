@@ -1,5 +1,5 @@
 const db = require("../database");
-const dateHelper = require("../helper/dateHelper");
+const dateHelper = require("../helper/date");
 
 const getUser = async (httpQuery) => {
   let query = "SELECT * FROM user";
@@ -25,18 +25,51 @@ const getUser = async (httpQuery) => {
   return rows;
 };
 
-const postUser = async (fullName, username, password, isSuperUser, addedBy) => {
-  const [post] = await db.query(
-    "INSERT INTO user (full_name, username, password, is_super_user, added_at, added_by) VALUES (?,?,?,?,?,?)",
-    [
+const postUser = async (
+  roleID,
+  candidateDetailID,
+  fullName,
+  username,
+  password,
+  phoneNum,
+  workMail,
+  personalMail,
+  homeAddress,
+  NIK,
+  NPWP,
+  dateOfBirth,
+  joinDate,
+  holidayQuota,
+  salary,
+  addedBy,
+) => {
+  const params = [];
+  params.push(roleID);
+  if (candidateDetailID) {
+    params.push(candidateDetailID);
+  }
+  params.push(
+    ...[
       fullName,
       username,
       password,
-      isSuperUser === "true" ? "TRUE" : "FALSE",
+      phoneNum,
+      workMail,
+      personalMail,
+      homeAddress,
+      NIK,
+      NPWP,
+      dateOfBirth,
+      joinDate,
+      holidayQuota,
+      salary,
       dateHelper.getDateTime(),
       addedBy,
     ],
   );
+
+  const query = `INSERT INTO user (role_id, ${candidateDetailID ? "candidate_detail_id, " : ""}full_name, username, password, phone_number, work_mail, personal_mail, home_address, nik, npwp, date_of_birth, join_date, holiday_quota, salary, created_at, created_by) VALUES (?,${candidateDetailID ? "?," : ""}?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  const [post] = await db.query(query, params);
 
   return post.affectedRows < 1 ? false : true;
 };

@@ -1,10 +1,12 @@
-const service = require("../services/userService");
+const userService = require("../services/userService");
+const roleService = require("../services/roleService");
+const candidateDetailService = require("../services/candidateDetailService");
 const bcrypt = require("bcrypt");
 const jwtHelper = require("../helper/jwt");
 
 const getUser = async (req, res) => {
   try {
-    const data = await service.getUser(req.query);
+    const data = await userService.getUser(req.query);
 
     return res.status(200).json({
       status: 200,
@@ -21,18 +23,67 @@ const getUser = async (req, res) => {
 };
 
 const postUser = async (req, res) => {
-  const { full_name, username, password, added_by } = req.body;
+  const {
+    role_id,
+    candidate_detail_id,
+    full_name,
+    username,
+    password,
+    phone_number,
+    work_mail,
+    personal_mail,
+    home_address,
+    nik,
+    npwp,
+    date_of_birth,
+    join_date,
+    holiday_quota,
+    salary,
+    added_by,
+  } = req.body;
 
   try {
-    if (!full_name || !username || !password) {
+    if (
+      !role_id ||
+      !full_name ||
+      !username ||
+      !password ||
+      !phone_number ||
+      !work_mail ||
+      !personal_mail ||
+      !home_address ||
+      !nik ||
+      !npwp ||
+      !date_of_birth ||
+      !join_date ||
+      !holiday_quota ||
+      !salary ||
+      !added_by
+    ) {
       return res
         .status(400)
         .json({ status: 400, message: "Bad request, missing body value(s)." });
     }
 
+    //  CHECK FOR ROLE
+    const role = await roleService.getRole({ role_id: role_id });
+    if (role.length < 1) {
+      return res.status(400).json({ status: 400, message: "Role not found!" });
+    }
+
+    // CHECK FOR CANDIDATE DETAIL
+    // const candidateDetail = await candidateDetailService.getCandidateDetail({
+    //   candidate_detail_id: candidate_detail_id,
+    // });
+    // if (candidateDetail.length < 1) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: 400, message: "Candidate detail not found!" });
+    // }
+
     //CHECK FOR DUPLICATES
-    const users = await service.getUser({ username: username });
-    if (users.length > 0) {
+    const user = await userService.getUser({ username: username });
+    if (user.length > 0) {
       return res.status(400).json({
         status: 400,
         message: "User with the username already exist.",
@@ -47,11 +98,22 @@ const postUser = async (req, res) => {
       return result;
     });
 
-    const postRes = await service.postUser(
+    const postRes = await userService.postUser(
+      role_id,
+      candidate_detail_id,
       full_name,
       username,
       hashedPass,
-      is_super_user,
+      phone_number,
+      work_mail,
+      personal_mail,
+      home_address,
+      nik,
+      npwp,
+      date_of_birth,
+      join_date,
+      holiday_quota,
+      salary,
       added_by,
     );
 
@@ -64,7 +126,22 @@ const postUser = async (req, res) => {
     return res.status(201).json({
       status: 201,
       message: "Succesfully created new user.",
-      data: { full_name: full_name, username: username },
+      data: {
+        role_id: role_id,
+        candidate_detail_id: candidate_detail_id,
+        full_name: full_name,
+        username: username,
+        phone_number: phone_number,
+        work_mail: work_mail,
+        personal_mail: personal_mail,
+        home_address: home_address,
+        nik: nik,
+        npwp: npwp,
+        date_of_birth: date_of_birth,
+        join_date: join_date,
+        holiday_quota: holiday_quota,
+        salary: salary,
+      },
     });
   } catch (error) {
     return res.status(500).json({
@@ -79,14 +156,14 @@ const deleteUser = async (req, res) => {
   const { user_id, deleted_by } = req.params;
   try {
     //CHECK IF EXIST
-    const user = await service.getUser({
+    const user = await userService.getUser({
       user_id: user_id,
     });
     if (user.length < 1) {
       return res.status(204).json({ status: 204, message: "No user found!" });
     }
 
-    const deleteRes = await service.deleteUser(user_id, deleted_by);
+    const deleteRes = await userService.deleteUser(user_id, deleted_by);
     if (!deleteRes) {
       return res
         .status(500)
@@ -116,7 +193,7 @@ const patchUser = async (req, res) => {
     }
 
     //CHECK IF EXIST
-    const ifExist = await service.getUser({
+    const ifExist = await userService.getUser({
       user_id: user_id,
     });
     if (ifExist.length < 1) {
@@ -125,7 +202,7 @@ const patchUser = async (req, res) => {
 
     //CHECK FOR DUPLICATES
     if (Object.keys(req.body).includes("username")) {
-      const ifDuplicate = await service.getUser({
+      const ifDuplicate = await userService.getUser({
         username: req.body.username,
       });
       if (ifDuplicate.length > 0) {
@@ -136,7 +213,7 @@ const patchUser = async (req, res) => {
       }
     }
 
-    const patchRes = await service.patchUser(user_id, edited_by, req.body);
+    const patchRes = await userService.patchUser(user_id, edited_by, req.body);
     if (!patchRes) {
       return res
         .status(500)
@@ -165,7 +242,7 @@ const loginUser = async (req, res) => {
         .json({ status: 400, message: "Bad request, missing body value(s)." });
     }
 
-    const user = await service.getUser({ username: username });
+    const user = await userService.getUser({ username: username });
     if (user.length < 1) {
       return res.status(404).json({ status: 404, message: "No user found!" });
     }
