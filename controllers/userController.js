@@ -74,14 +74,14 @@ const postUser = async (req, res) => {
     }
 
     // CHECK FOR CANDIDATE DETAIL
-    // const candidateDetail = await candidateDetailService.getCandidateDetail({
-    //   candidate_detail_id: candidate_detail_id,
-    // });
-    // if (candidateDetail.length < 1) {
-    //   return res
-    //     .status(400)
-    //     .json({ status: 400, message: "Candidate detail does not exist!" });
-    // }
+    const candidateDetail = await candidateDetailService.getCandidateDetail({
+      candidate_detail_id: candidate_detail_id,
+    });
+    if (candidateDetail.length < 1) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Candidate detail does not exist!" });
+    }
 
     //CHECK FOR DUPLICATES
     const user = await userService.getUser({ username: username });
@@ -216,18 +216,18 @@ const patchUser = async (req, res) => {
     }
 
     //CHECK FOR CADIDATE
-    // if (Object.keys(req.body).includes("candidate_detail_id")) {
-    //   const ifDuplicateCandidateDetail =
-    //     await candidateDetailService.getCandidateDetail({
-    //       candidate_detail_id: req.body.candidate_detail_id,
-    //     });
-    //   if (ifDuplicateCandidateDetail.length > 0) {
-    //     return res.status(400).json({
-    //       status: 400,
-    //       message: "Candidate detail does not exist!.",
-    //     });
-    //   }
-    // }
+    if (Object.keys(req.body).includes("candidate_detail_id")) {
+      const ifDuplicateCandidateDetail =
+        await candidateDetailService.getCandidateDetail({
+          candidate_detail_id: req.body.candidate_detail_id,
+        });
+      if (ifDuplicateCandidateDetail.length > 0) {
+        return res.status(400).json({
+          status: 400,
+          message: "Candidate detail does not exist!.",
+        });
+      }
+    }
 
     //CHECK FOR DUPLICATES
     if (Object.keys(req.body).includes("username")) {
