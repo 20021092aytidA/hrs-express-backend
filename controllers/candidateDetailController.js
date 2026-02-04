@@ -1,7 +1,28 @@
 const service = require("../services/candidateDetailService");
 
 const getCandidateDetail = async (req, res) => {
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     const candidateDetails = await service.getCandidateDetail(req.query);
     return res.status(200).json({
       status: 200,
@@ -28,7 +49,28 @@ const postCandidateDetail = async (req, res) => {
     added_by,
   } = req.body;
 
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (
       !position_name ||
       !current_company ||
@@ -82,8 +124,28 @@ const postCandidateDetail = async (req, res) => {
 
 const patchCandidateDetail = async (req, res) => {
   const { candidate_detail_id, user_id } = req.params;
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
 
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (!candidate_detail_id || !user_id) {
       return res
         .status(400)
@@ -124,7 +186,28 @@ const patchCandidateDetail = async (req, res) => {
 
 const deleteCandidateDetail = async (req, res) => {
   const { candidate_detail_id, user_id } = req.params;
+  let jwtToken = undefined;
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader) {
+    // Bearer [jwt-token]
+    jwtToken = authHeader.split(" ")[1];
+  }
+
   try {
+    if (!jwtToken) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Missing authorization token!" });
+    }
+
+    const isTokenValid = jwtHelper.checkKey(jwtToken);
+    if (!isTokenValid) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Authorization token is not valid!" });
+    }
+
     if (!candidate_detail_id || !user_id) {
       return res
         .status(400)
