@@ -1,4 +1,5 @@
 const service = require("../services/candidateDetailService");
+const jwtHelper = require("../helper/jwt");
 
 const getCandidateDetail = async (req, res) => {
   let jwtToken = undefined;
